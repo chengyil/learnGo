@@ -1,9 +1,30 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 )
+
+func TestRead(t *testing.T) {
+	data := bytes.NewBufferString("Hello World!")
+	buf := make([]byte, 0, 1)
+
+	for {
+		if len(buf) == cap(buf) {
+			buf = append(buf, 1)
+		}
+
+		length, err := data.Read(buf[len(buf):])
+		if err != nil {
+			break
+		}
+		fmt.Printf("%s, length : %v, len %v, cap %v\n", string(buf), length, len(buf), cap(buf))
+	}
+
+	fmt.Println(string(buf))
+
+}
 
 func TestInt(t *testing.T) {
 	var n int

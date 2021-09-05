@@ -7,6 +7,13 @@ import (
 )
 
 type Todo struct {
+	ID     int64  `json:"ID"`
+	Author string `json:"author"`
+	Title  string `json:"title,omitempty"`
+	Done   bool   `json:"done,omitempty"`
+}
+
+type NewTodoRequest struct {
 	Author string `json:"author"`
 	Title  string `json:"title,omitempty"`
 	Done   bool   `json:"done,omitempty"`

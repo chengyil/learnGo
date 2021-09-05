@@ -17,8 +17,8 @@ func TestMessage(t *testing.T) {
 	var empty Todo
 	fmt.Println(empty)
 	empty.Unmarshal([]byte(`{
-		"Author": "Huey Wen",
-		"Title": "Buy Choco",
+		"author": "Huey Wen",
+		"title": "Buy Choco"
 	}`))
-	fmt.Println(empty)
+	fmt.Printf("%T, %v, %#v\n", empty, empty, empty)
 }

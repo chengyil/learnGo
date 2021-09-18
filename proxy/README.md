@@ -1,3 +1,4 @@
+
 ## Header Set vs Add
 
 ``` golang
@@ -51,3 +52,6 @@ curl -X get http://localhost:3001/hello -H "conTent-type: application/json"
 On the proxied side
 Get("content-type") "" 
 Get(textproto.CanoicalMIMEHeaderKey("content-type")) application/json
+
+### References
+https://tachingchen.com/blog/pitfall-of-golang-header-operation/

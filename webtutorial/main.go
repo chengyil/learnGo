@@ -40,7 +40,7 @@ func main() {
 }
 
 func startServer() {
-	registerEndpoint()
+	registerEndpoints()
 	err := http.ListenAndServe("0.0.0.0:3000", nil)
 	if err == nil {
 		fmt.Printf("Error while serving %v", err)
@@ -49,11 +49,13 @@ func startServer() {
 
 type worldHandler struct{}
 
+type middleware func(h http.Handler) http.Handler
+
 func (t *worldHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello"))
 }
 
-func registerEndpoint() {
+func registerEndpoints() {
 	http.Handle("/world", new(worldHandler))
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("header", r.Header)
@@ -65,7 +67,36 @@ func registerEndpoint() {
 		w.Write(message)
 	})
 	http.Handle("/todo", new(todoController))
-	http.HandleFunc("/todo/", handleTodo)
+	registerEndpoint("/todo/", http.HandlerFunc(handleTodo), myFirstMiddleware, myDeferredMiddleware)
+}
+
+func myFirstMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Before First")
+		h.ServeHTTP(w, r)
+		fmt.Println("After First")
+	})
+}
+
+func myDeferredMiddleware(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := func() string {
+			fmt.Println("Before Defer")
+			return "After Def"
+		}
+		defer fmt.Println(log())
+		h.ServeHTTP(w, r)
+	})
+}
+
+func registerEndpoint(path string, endpoint http.Handler, middlewares ...middleware) {
+	var handler http.Handler = endpoint
+
+	for _, h := range middlewares {
+		handler = h(handler)
+	}
+
+	http.Handle(path, handler)
 }
 
 func handleTodo(w http.ResponseWriter, r *http.Request) {
@@ -115,7 +146,6 @@ func updateTodo(todo *dto.Todo, w http.ResponseWriter, r *http.Request) {
 	todo.Author = payload.Author
 	todo.Done = payload.Done
 	todo.Title = payload.Title
-
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -143,6 +173,7 @@ func getTodo(todo *dto.Todo, w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
 }
 
@@ -169,6 +200,7 @@ func (t *todoController) GetTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
 }
 

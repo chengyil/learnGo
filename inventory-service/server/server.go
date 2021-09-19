@@ -16,10 +16,12 @@ func Serve() {
 }
 
 func serve() {
-	registerEndpoints()
-	ListenAndServe("0.0.0.0:3000", nil)
+	routes := registerRoutes()
+	ListenAndServe("0.0.0.0:3000", routes)
 }
 
-func registerEndpoints() {
-	registerEndpoint("/products", handler.HandleProducts())
+func registerRoutes() *Routes {
+	routes := NewRoutes()
+	routes.registerEndpoint("/products", handler.HandleProducts())
+	return routes
 }

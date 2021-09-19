@@ -2,6 +2,7 @@ package server
 
 import (
 	"inventory-service/server/handler"
+	"inventory-service/storage"
 	"net/http"
 )
 
@@ -10,6 +11,7 @@ var (
 )
 
 func Serve() {
+	storage.Init()
 	serve()
 }
 

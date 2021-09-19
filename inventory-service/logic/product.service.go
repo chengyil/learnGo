@@ -1,34 +1,23 @@
 package logic
 
-import "inventory-service/dto"
+import (
+	"inventory-service/dto"
+	"inventory-service/storage"
+)
 
 func GetProductsList() []*dto.Product {
-	return []*dto.Product{
-		{
-			ProductID:      1,
-			Manufacturer:   "IBM",
-			Sku:            "sku",
-			Upc:            "Upc",
-			PricePerUnit:   "1.1",
-			QuantityOnHand: 10,
-			ProductName:    "Server",
-		},
-		{
-			ProductID:      2,
-			Manufacturer:   "IBM",
-			Sku:            "sku",
-			Upc:            "Upc",
-			PricePerUnit:   "1.1",
-			QuantityOnHand: 10,
-			ProductName:    "Laptop",
-		},
+	productDtos := make([]*dto.Product, 0)
+	products := storage.Find()
+	for _, product := range products {
+		productDtos = append(productDtos, &dto.Product{
+			ProductID:      product.ProductID,
+			ProductName:    product.ProductName,
+			Manufacturer:   product.Manufacturer,
+			Sku:            product.Sku,
+			Upc:            product.Upc,
+			PricePerUnit:   product.PricePerUnit,
+			QuantityOnHand: product.QuantityOnHand,
+		})
 	}
+	return productDtos
 }
-
-// ProductID      int    `json:"productId"`
-// Manufacturer   string `json:"manufacturer"`
-// Sku            string `json:"sku"`
-// Upc            string `json:"upc"`
-// PricePerUnit   string `json:"pricePerUnit"`
-// QuantityOnHand int    `json:"quantityOnHand"`
-// ProductName    string `json:"productName"`

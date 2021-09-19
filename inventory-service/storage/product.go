@@ -9,7 +9,7 @@ import (
 )
 
 type Product struct {
-	ProductID      int    `json:"id"`
+	ProductID      int    `json:"productID"`
 	Manufacturer   string `json:"manufacturer"`
 	Sku            string `json:"sku"`
 	Upc            string `json:"upc"`
@@ -25,26 +25,37 @@ var (
 	}{m: make(map[int]*Product)}
 )
 
+func Find() []*Product {
+	prods := make([]*Product, 0)
+	for _, product := range products.m {
+		prods = append(prods, product)
+	}
+	return prods
+}
+
 func Init() {
-	filename := "products.json"
+	filename := "./storage/products.json"
 	_, err := os.Stat(filename)
 
 	if os.IsNotExist(err) {
-		log.Fatal("Unable to load products")
+		log.Fatal("Unable to load products", err)
 	}
 
 	content, err := ioutil.ReadFile(filename)
 
 	if err != nil {
-		log.Fatal("Unable to load products")
+		log.Fatal("Unable to load products", err)
 	}
 
-	products := make([]*Product, 0)
+	loaded := make([]*Product, 0)
 
-	err = json.Unmarshal(content, &products)
-
-	if err != nil {
+	if err = json.Unmarshal(content, &loaded); err != nil {
 		log.Fatal(err)
 	}
 
+	products.Lock()
+	defer products.Unlock()
+	for _, product := range loaded {
+		products.m[product.ProductID] = product
+	}
 }

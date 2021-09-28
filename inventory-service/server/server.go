@@ -1,6 +1,7 @@
 package server
 
 import (
+	"inventory-service/routes"
 	"inventory-service/server/handler"
 	"inventory-service/storage"
 	"net/http"
@@ -20,8 +21,8 @@ func serve() {
 	ListenAndServe("0.0.0.0:3000", routes)
 }
 
-func registerRoutes() *Routes {
-	routes := NewRoutes()
-	routes.registerEndpoint("/products", handler.HandleProducts())
-	return routes
+func registerRoutes() *routes.Routes {
+	myRoutes := routes.NewRoutes()
+	myRoutes.RegisterEndpoint("/products", handler.HandleProducts())
+	return myRoutes
 }
